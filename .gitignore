@@ -1,0 +1,7 @@
+# Server Python
+server/venv/
+server/__pycache__/
+*.pyc
+
+# MacOS/Linux system files
+.DS_Store
