@@ -10,7 +10,7 @@ export default function App() {
   
   const ws = useRef<WebSocket | null>(null);
   
-  const SERVER_IP = '192.168.18.155';
+  const SERVER_IP = '10.41.55.167';
   const SERVER_PORT = '8000';
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, mode === 'keyboard' && styles.containerLandscape]}>
       <Header connected={connected} mode={mode} setMode={setMode} />
       
       {mode === 'mouse' ? (
@@ -50,5 +50,13 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#121212', paddingTop: 40, alignItems: 'center' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#121212', 
+    paddingTop: 40, 
+    alignItems: 'center' 
+  },
+  containerLandscape: { 
+    paddingTop: 15 
+  }
 });

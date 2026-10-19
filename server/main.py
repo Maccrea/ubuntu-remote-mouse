@@ -7,10 +7,18 @@ app = FastAPI()
 mouse = MouseController()
 keyboard = KeyboardController()
 
+KEY_MAPPING = {
+    "esc": Key.esc, "tab": Key.tab, "enter": Key.enter, "backspace": Key.backspace,
+    "space": Key.space, "shift": Key.shift, "ctrl": Key.ctrl, "alt": Key.alt,
+    "win": Key.cmd, "up": Key.up, "down": Key.down, "left": Key.left,
+    "right": Key.right, "home": Key.home, "end": Key.end, "pgup": Key.page_up,
+    "pgdn": Key.page_down, "ins": Key.insert
+}
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    print("HP berhasil terhubung!")
+    print("✅ HP Terhubung!")
     
     try:
         while True:
@@ -19,32 +27,22 @@ async def websocket_endpoint(websocket: WebSocket):
             action_type = payload.get("type")
 
             if action_type == "move":
-                dx = payload.get("dx", 0)
-                dy = payload.get("dy", 0)
-                mouse.move(dx, dy)
-
+                mouse.move(payload.get("dx", 0), payload.get("dy", 0))
             elif action_type == "click":
-                btn = payload.get("button", "left")
-                target_btn = Button.left if btn == "left" else Button.right
-                mouse.click(target_btn)
-
-            elif action_type == "scroll":
-                dy = payload.get("dy", 0)
-                mouse.scroll(0, dy)
-
-            # --- FITUR KEYBOARD ---
-            elif action_type == "type_text":
-                text = payload.get("text", "")
-                keyboard.type(text)
-
-            elif action_type == "press_key":
-                key_name = payload.get("key")
-                if key_name == "enter":
-                    keyboard.press(Key.enter)
-                    keyboard.release(Key.enter)
-                elif key_name == "backspace":
-                    keyboard.press(Key.backspace)
-                    keyboard.release(Key.backspace)
-
+                btn = Button.left if payload.get("button", "left") == "left" else Button.right
+                mouse.click(btn)
+                
+            elif action_type == "key_down":
+                raw_key = payload.get("key", "").lower()
+                target_key = KEY_MAPPING.get(raw_key, raw_key)
+                print(f"👇 HOLD: {raw_key}")
+                keyboard.press(target_key)
+                
+            elif action_type == "key_up":
+                raw_key = payload.get("key", "").lower()
+                target_key = KEY_MAPPING.get(raw_key, raw_key)
+                print(f"☝️ RELEASE: {raw_key}")
+                keyboard.release(target_key)
+                
     except WebSocketDisconnect:
-        print("HP terputus!")
+        print("❌ HP Terputus!")
